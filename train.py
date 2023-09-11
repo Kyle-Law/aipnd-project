@@ -8,8 +8,7 @@ from torch.optim.lr_scheduler import StepLR
 from PIL import Image
 from tqdm import tqdm
 import matplotlib.pyplot as plt
-
-
+import argparse
 
 def model_init(arch="vgg16", learning_rate=0.001, hidden_units=4096, use_gpu=False, use_mps=False):
     if arch == "vgg16":
@@ -79,7 +78,11 @@ def main():
     train_dir = data_dir + '/train'
     valid_dir = data_dir + '/valid'
     print_every = 50
-
+    steps = 0
+    best_val_loss = float('inf')
+    patience = 5
+    no_improve_epoch = 0
+    
     # Define transforms
     # TODO: Define your transforms for the training, validation, and testing sets
     data_transforms = {
@@ -121,8 +124,6 @@ def main():
         use_mps=args.mps
     )
     
-    for param in model.parameters():
-        param.requires_grad = False
     optimizer = optim.Adam(model.classifier.parameters(), lr=args.learning_rate, weight_decay=1e-4)
     scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, 'min', patience=2, factor=0.5, verbose=True)
     # Optimization: For Gradient Accumulation
