@@ -1,34 +1,45 @@
-# Imports here
+# Python Standard Library
+import argparse
+
+# External libraries
+from PIL import Image
+from tqdm import tqdm
+
+# PyTorch core
 import torch
 import torch.nn as nn
 import torch.optim as optim
-from torchvision import models, transforms, datasets
 from torch.utils.data import DataLoader
-from torch.optim.lr_scheduler import StepLR
-from PIL import Image
-from tqdm import tqdm
-import matplotlib.pyplot as plt
-import argparse
+
+# PyTorch torchvision
+from torchvision import datasets, models, transforms
+from torch.optim.lr_scheduler import ReduceLROnPlateau
+
 
 def model_init(arch="vgg16", learning_rate=0.001, hidden_units=4096, use_gpu=False, use_mps=False):
     if arch == "vgg16":
         model = models.vgg16(pretrained=True)
+        input_features = model.classifier[0].in_features
+    elif arch == "resnet18":
+        model = models.resnet18(pretrained=True)
+        input_features = model.fc.in_features
+        model.fc = nn.Linear(input_features, 102)
+    elif arch == "densenet121":
+        model = models.densenet121(pretrained=True)
+        input_features = model.classifier.in_features
+        model.classifier = nn.Linear(input_features, 102)
     else:
-        # You can add other architectures here
         raise ValueError(f"Unsupported architecture: {arch}")
 
-    for param in model.parameters():
-        param.requires_grad = False
-
-    classifier = nn.Sequential(
-        nn.Linear(25088, hidden_units),
-        nn.ReLU(),
-        nn.Dropout(0.5),
-        nn.Linear(hidden_units, 102),
-        nn.LogSoftmax(dim=1)
-    )
-
-    model.classifier = classifier
+    if arch == "vgg16":  # Only add this classifier for VGG16
+        classifier = nn.Sequential(
+            nn.Linear(input_features, hidden_units),
+            nn.ReLU(),
+            nn.Dropout(0.5),
+            nn.Linear(hidden_units, 102),
+            nn.LogSoftmax(dim=1)
+        )
+        model.classifier = classifier
 
     criterion = nn.NLLLoss()
     optimizer = optim.Adam(model.classifier.parameters(), lr=learning_rate)
@@ -64,7 +75,9 @@ def main():
     parser = argparse.ArgumentParser(description='Train a new network on a dataset')
     parser.add_argument('data_directory', type=str, help='Data directory')
     parser.add_argument('--save_dir', type=str, default='.', help='Directory to save checkpoints')
-    parser.add_argument('--arch', type=str, default='vgg16', help='Architecture [available: vgg16, vgg13]')
+    parser.add_argument('--arch', type=str, default='vgg16', 
+                        choices=['vgg16', 'resnet18', 'densenet121'], 
+                        help='Architecture [available: vgg16, resnet18, densenet121]')
     parser.add_argument('--learning_rate', type=float, default=0.001, help='Learning rate')
     parser.add_argument('--hidden_units', type=int, default=512, help='Hidden units')
     parser.add_argument('--epochs', type=int, default=1, help='Number of epochs')
