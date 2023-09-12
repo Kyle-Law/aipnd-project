@@ -90,18 +90,17 @@ python predict.py <image_path> <checkpoint> [OPTIONS]
 
 ### Invocation Example
 
-````
+```
 
-(torch_env) kyle@Kyles-MacBook-Pro aipnd-project % python3 predict.py image.jpg checkpoint.pth --mps
+(torch_env) kyle@Kyles-MacBook-Pro aipnd-project % python3 predict.py image.jpg checkpoint.pth --mps --category_names cat_to_name.json
+/Users/kyle/anaconda3/envs/torch_env/lib/python3.8/site-packages/torchvision/models/_utils.py:208: UserWarning: The parameter 'pretrained' is deprecated since 0.13 and may be removed in the future, please use 'weights' instead.
+  warnings.warn(
+/Users/kyle/anaconda3/envs/torch_env/lib/python3.8/site-packages/torchvision/models/_utils.py:223: UserWarning: Arguments other than a weight enum or `None` for 'weights' are deprecated since 0.13 and may be removed in the future. The current behavior is equivalent to passing `weights=VGG16_Weights.IMAGENET1K_V1`. You can also use `weights=VGG16_Weights.DEFAULT` to get the most up-to-date weights.
+  warnings.warn(msg)
+Probabilities: [0.05254214257001877, 0.04158187285065651, 0.03718974068760872, 0.030157823115587234, 0.028122209012508392]
+Classes: ['rose', 'lotus lotus', 'bougainvillea', 'petunia', 'pelargonium']
 
-/Users/kyle/anaconda3/envs/torch_env/lib/python3.8/site-packages/torchvision/models/\_utils.py:208: UserWarning: The parameter 'pretrained' is deprecated since 0.13 and may be removed in the future, please use 'weights' instead.
-warnings.warn(
-/Users/kyle/anaconda3/envs/torch_env/lib/python3.8/site-packages/torchvision/models/\_utils.py:223: UserWarning: Arguments other than a weight enum or `None` for 'weights' are deprecated since 0.13 and may be removed in the future. The current behavior is equivalent to passing `weights=VGG16_Weights.IMAGENET1K_V1`. You can also use `weights=VGG16_Weights.DEFAULT` to get the most up-to-date weights.
-warnings.warn(msg)
-Probabilities: [0.05889158323407173, 0.057701073586940765, 0.057300813496112823, 0.04654904082417488, 0.04359809681773186]
-Classes: ['74', '51', '83', '95', '78']```
-
-````
+```
 
 ### Arguments
 
